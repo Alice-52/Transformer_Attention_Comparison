@@ -1,0 +1,10 @@
+{
+  "attention_type": "multihead",
+  "seed": 777,
+  "best_val_f1": 0.8958121085948919,
+  "test_loss": 0.3078665697574616,
+  "test_accuracy": 0.8919736842105264,
+  "test_f1_macro": 0.8918869079784766,
+  "trainable_parameters": 4105476,
+  "wall_time_sec": 98.58289274599974
+}

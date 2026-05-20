@@ -44,7 +44,7 @@ def evaluate(model, dataloader, device: torch.device) -> Dict[str, float]:
     acc = accuracy_score(all_labels, all_preds)
     # F1 - macro - считаем сначала отдельно по каждому классу, а потом усредняем 
     # нужно качество не только по самому частому классу
-    f1 = f1_score(all_labels, all_preds, average='macro')
+    f1 = f1_score(all_labels, all_preds, average='macro',zero_division=0)
 
     # Выводим ключевые метрики
     return {'loss': avg_loss, 'accuracy': acc, 'f1_macro': f1}

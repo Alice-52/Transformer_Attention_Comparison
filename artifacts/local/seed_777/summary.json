@@ -1,0 +1,10 @@
+{
+  "attention_type": "local",
+  "seed": 777,
+  "best_val_f1": 0.8910137567466514,
+  "test_loss": 0.32300976734412346,
+  "test_accuracy": 0.888421052631579,
+  "test_f1_macro": 0.888130662579515,
+  "trainable_parameters": 4105476,
+  "wall_time_sec": 99.86888511100005
+}

@@ -6,7 +6,7 @@ from typing import Optional
 import torch
 import torch.nn as nn
 
-from .attention import LocalMultiHeadAttention, MultiHeadAttention, SingleHeadAttention
+from .attention import AdditiveAttention, LocalMultiHeadAttention, MultiHeadAttention, SingleHeadAttention
 
 # Позиционное кодирование - где находится токен
 class PositionalEncoding(nn.Module):
@@ -57,6 +57,8 @@ class EncoderBlock(nn.Module):
                 window_size=local_window_size,
                 dropout=dropout,
             )
+        elif attention_type == 'additive':
+            self.attn = AdditiveAttention(d_model=d_model, dropout=dropout)
         else:
             raise ValueError(f'Unknown attention_type: {attention_type}')
 

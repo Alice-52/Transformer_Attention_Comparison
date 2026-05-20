@@ -1,0 +1,10 @@
+{
+  "attention_type": "additive",
+  "seed": 777,
+  "best_val_f1": 0.8939320112395361,
+  "test_loss": 0.31571705862095484,
+  "test_accuracy": 0.8886842105263157,
+  "test_f1_macro": 0.8885373881042783,
+  "trainable_parameters": 4138756,
+  "wall_time_sec": 767.5896002640002
+}

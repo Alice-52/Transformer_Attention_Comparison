@@ -1,0 +1,10 @@
+{
+  "attention_type": "single_head",
+  "seed": 777,
+  "best_val_f1": 0.8956275800041591,
+  "test_loss": 0.3093085913909109,
+  "test_accuracy": 0.8925,
+  "test_f1_macro": 0.8921847524242668,
+  "trainable_parameters": 4105476,
+  "wall_time_sec": 74.9992551839996
+}

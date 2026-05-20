@@ -1,5 +1,6 @@
 # Доп функции
 import random
+from pathlib import Path
 from typing import Iterable, List
 
 import numpy as np
@@ -37,3 +38,9 @@ def chunks(iterable: Iterable, size: int):
             batch = []
     if batch:
         yield batch
+
+# Для папок проверка
+def ensure_dir(path: str | Path) -> Path:
+    out = Path(path)
+    out.mkdir(parents=True, exist_ok=True)
+    return out

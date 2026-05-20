@@ -147,6 +147,81 @@ class MultiHeadAttention(nn.Module):
         return self.out(self.dropout(context))
 
 
+# ADDITIVE - Bahdnau
+class AdditiveAttention(nn.Module):
+    # Все параметры как обычно
+    # hidden_sim - размерность внутренней сети оценки (если не передали, то равен d_model)
+    def __init__(self, d_model: int, hidden_dim: Optional[int] = None, dropout: float = 0.1):
+        super().__init__()
+        hidden_dim = hidden_dim or d_model
+        # Те же Q, K, V
+        self.w_q = nn.Linear(d_model, d_model)
+        self.w_k = nn.Linear(d_model, d_model)
+        self.w_v = nn.Linear(d_model, d_model)
+
+        # САМОЕ ГЛАВНОЕ В ADDITIVE
+        # Считается связанность/совместимость между токенами
+        # Вектор признаков проходит через маленькую нейросеть -> score
+        # (в других - dot-product - просто скалярное произведение)
+        self.score = nn.Sequential(
+            nn.Linear(d_model, hidden_dim),
+            nn.Tanh(),
+            nn.Linear(hidden_dim, 1, bias=False),
+        )
+
+        # Возвращаем обратно к размерности d_model
+        self.out = nn.Linear(d_model, d_model)
+        # Снова говорим НЕТ переобучению
+        self.dropout = nn.Dropout(dropout)
+
+    def forward(self, x: torch.Tensor, mask: Optional[torch.Tensor] = None) -> torch.Tensor:
+        # Превращаем в векторы
+        q = self.w_q(x)
+        k = self.w_k(x)
+        v = self.w_v(x)
+
+        # Размерности подготавливаем для этой пары для обучения
+        q_exp = q.unsqueeze(2)
+        k_exp = k.unsqueeze(1)
+
+        # Энергия - совместимость  - query и key складываются, проходимся tanh - нелинейное представление пары токенов
+        # Вместо произведения получаем обучаемую совместимость
+        energy = torch.tanh(q_exp + k_exp)
+        # Превращаем пару токенос в число
+        scores = self.score(energy).squeeze(-1)
+
+        # Учитываем пустые токены - padding
+        query_mask = None
+        if mask is not None:
+            mask = mask.to(dtype=torch.bool)
+            if mask.dim() == 2:
+                key_mask = mask.unsqueeze(1)
+                query_mask = mask.unsqueeze(-1)
+                scores = scores.masked_fill(~key_mask, -1e9)
+            elif mask.dim() == 3:
+                key_mask = mask.squeeze(1) if mask.size(1) == 1 else mask
+                scores = scores.masked_fill(~key_mask, -1e9)
+            else:
+                # Уже натыкалась на ошибки с размерностями - нам это больше не надо
+                raise ValueError('Wrong mask shape!! (add. att.)')
+
+        # Классически подсчитываем финальное внимание
+        attn = torch.softmax(scores, dim=-1)
+        attn = torch.nan_to_num(attn, nan=0.0)
+
+        # Умножаем веса на value - новое представления токенов
+        context = torch.matmul(attn, v)
+
+        # Обнуляем pad-токены, чтобы не мешались
+        if query_mask is not None:
+            context = context * query_mask.float()
+
+        # Регуляризация и вывод
+        return self.out(self.dropout(context))
+
+
+
+
 # LOCAL - локально вокруг слова - не вся последовательность
 # Наследуемся от Multi
 class LocalMultiHeadAttention(MultiHeadAttention):

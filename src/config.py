@@ -27,7 +27,7 @@ class Config:
     # Наша регуляризация против переобучения
     dropout: float = 0.1
     # Выбираем тип механизма внимания!!
-    # Single_head / multihead / local
+    # Single_head / multihead / local / additive
     attention_type: str = 'multihead'
     local_window_size: int = 8
     # В AG_News - World/Sports/Business/Sci-Tech
@@ -48,3 +48,5 @@ class Config:
     seed: int = 42
     # Где обучаем
     device: str = 'cuda'
+    # Папка с результатами
+    output_dir: str = 'artifacts'
